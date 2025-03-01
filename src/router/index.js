@@ -1,11 +1,22 @@
-// src/main.js
+// src/router/index.js
 import Vue from 'vue';
-import App from './App.vue';
-import router from './router'; // Import the router you just created
+import VueRouter from 'vue-router';
+import Home from '../views/Home.vue'; // Adjust path if Home.vue is elsewhere
 
-Vue.config.productionTip = false;
+Vue.use(VueRouter);
 
-new Vue({
-    router, // Add the router to your Vue instance
-    render: h => h(App)
-}).$mount('#app');
+const routes = [
+    {
+        path: '/',
+        name: 'Home',
+        component: Home
+    }
+    // Add other routes as needed
+];
+
+const router = new VueRouter({
+    mode: 'hash', // For GitHub Pages compatibility
+    routes
+});
+
+export default router;
