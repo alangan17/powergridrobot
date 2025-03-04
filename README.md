@@ -1,11 +1,14 @@
-# Power Grid Robot Helper
+# Power Grid Robot Simulator
 
-A Vue.js app to assist with the Power Grid Robot expansion.
+A webapp to simulate robot players for the Power Grid tabletop game, focusing on the Auction and Power Generation phases. Built with HTMX and deployed on GitHub Pages.
 
-## Deployment to GitHub Pages
+## Usage
+1. Select number of robots (1-5).
+2. Configure each robot (A/C cards, Elektro, plants, resources, cities).
+3. Enter the actual market plants and your turn order.
+4. Click "Simulate" to see robot decisions.
 
-1. Ensure the repository is set up with the files above.
-2. Push changes to the `main` branch.
-3. The GitHub Actions workflow (`.github/workflows/deploy.yml`) will build and deploy the app to the `gh-pages` branch.
-4. In repository Settings > Pages, set the source to the `gh-pages` branch.
-5. Visit `https://username.github.io/power-grid-robot-helper/` to see the app live.
+## Deployment
+- Push to a GitHub repository.
+- Enable GitHub Pages in Settings > Pages > Source: `main` branch, `/ (root)` folder.
+- Access at `https://<username>.github.io/<repo-name>/`.

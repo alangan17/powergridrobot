@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Grid Robot Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <h1>Power Grid Robot Simulator</h1>
+    <form id="sim-form" hx-post="/simulate" hx-target="#results" hx-swap="innerHTML">
+        <label>Number of Robots (1-5):</label>
+        <select id="num-robots" name="num-robots" onchange="updateRobotInputs()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <div id="robot-inputs"></div>
+
+        <label>Actual Market Plants (e.g., "3, 4, 5, 6"):</label>
+        <input type="text" name="market" value="3, 4, 5, 6"><br>
+
+        <label>Your Turn Order Position:</label>
+        <select name="player-order">
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+            <option value="6">6th</option>
+        </select><br>
+
+        <button type="button" onclick="simulate()">Simulate</button>
+    </form>
+
+    <div id="results"></div>
+</body>
+
+</html>
