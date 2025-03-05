@@ -24,3 +24,28 @@ select {
 #results {
     margin-top: 20px;
 }
+
+.info-btn {
+    margin-left: 5px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+legend {
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: 60px;
+}

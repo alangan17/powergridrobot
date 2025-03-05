@@ -7,7 +7,10 @@
     <title>Power Grid Robot Simulator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <script src="script.js" defer></script>
+    <script src="scripts/robot.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/simulation.js"></script>
+    <script src="scripts/main.js" defer></script>
 </head>
 
 <body>
@@ -21,11 +24,25 @@
             <option value="4">4</option>
             <option value="5">5</option>
         </select>
+        <button type="button" class="info-btn" onclick="showInfo('num-robots')">(i)</button><br>
 
         <div id="robot-inputs"></div>
 
-        <label>Actual Market Plants (e.g., "3, 4, 5, 6"):</label>
-        <input type="text" name="market" value="3, 4, 5, 6"><br>
+        <fieldset>
+            <legend>Actual Market Plants</legend>
+            <label>Plant 1:</label>
+            <input type="number" name="market-1" value="3" min="3" max="50">
+            <button type="button" class="info-btn" onclick="showInfo('market')">(i)</button><br>
+            <label>Plant 2:</label>
+            <input type="number" name="market-2" value="4" min="3" max="50">
+            <button type="button" class="info-btn" onclick="showInfo('market')">(i)</button><br>
+            <label>Plant 3:</label>
+            <input type="number" name="market-3" value="5" min="3" max="50">
+            <button type="button" class="info-btn" onclick="showInfo('market')">(i)</button><br>
+            <label>Plant 4:</label>
+            <input type="number" name="market-4" value="6" min="3" max="50">
+            <button type="button" class="info-btn" onclick="showInfo('market')">(i)</button><br>
+        </fieldset>
 
         <label>Your Turn Order Position:</label>
         <select name="player-order">
@@ -35,7 +52,8 @@
             <option value="4">4th</option>
             <option value="5">5th</option>
             <option value="6">6th</option>
-        </select><br>
+        </select>
+        <button type="button" class="info-btn" onclick="showInfo('player-order')">(i)</button><br>
 
         <button type="button" onclick="simulate()">Simulate</button>
     </form>
