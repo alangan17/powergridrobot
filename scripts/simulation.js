@@ -13,11 +13,11 @@ function simulate() {
 
     const robots = [];
     for (let i = 1; i <= numRobots; i++) {
-        const aCard = formData.get(`a-card-${i}`);
-        const bCard = formData.get(`b-card-${i}`);
-        const dCard = formData.get(`d-card-${i}`);
-        const cCard = formData.get(`c-card-${i}`);
-        const eCard = formData.get(`e-card-${i}`);
+        const aCard = formData.get(`a-card-${i}`); // Phase 1
+        const bCard = formData.get(`b-card-${i}`); // Phase 2
+        const dCard = formData.get(`d-card-${i}`); // Phase 4
+        const cCard = formData.get(`c-card-${i}`); // Phase 3
+        const eCard = formData.get(`e-card-${i}`); // Special
         const elektro = parseInt(formData.get(`elektro-${i}`));
         const plants = formData.get(`plants-${i}`).split(",").map(Number).filter(n => !isNaN(n));
         const resources = formData.get(`resources-${i}`);
@@ -27,9 +27,9 @@ function simulate() {
 
     let results = "<h2>Simulation Results</h2>";
 
-    // Adjust turn order for "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«"
-    const lastInOrderRobots = robots.filter(r => r.eCard === "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«");
-    const otherRobots = robots.filter(r => r.eCard !== "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«");
+    // Adjust turn order for "PHASE 1: ALWAYS LAST IN PLAYER ORDER"
+    const lastInOrderRobots = robots.filter(r => r.specialCard === "PHASE 1: ALWAYS LAST IN PLAYER ORDER");
+    const otherRobots = robots.filter(r => r.specialCard !== "PHASE 1: ALWAYS LAST IN PLAYER ORDER");
     const bidders = [
         ...otherRobots.sort((a, b) => b.cities - a.cities || b.plants[0]?.num - a.plants[0]?.num),
         ...lastInOrderRobots
@@ -37,7 +37,7 @@ function simulate() {
     const bidderOrder = bidders.map(r => r.id - 1);
     bidderOrder.splice(playerOrder - 1, 0, -1);
 
-    // Auction Phase
+    // Auction Phase (uses Phase 2: Auction Power Plants)
     results += "<h3>Auction Phase</h3>";
     let available = [...market];
     for (let i = 0; i < bidderOrder.length && available.length > 0; i++) {
@@ -49,7 +49,7 @@ function simulate() {
         }
         const bid = robot.bid(available[0], available);
         if (bid) {
-            robot.elektro -= bid.actualCost; // Use actualCost instead of bid for half-bid ability
+            robot.elektro -= bid.actualCost;
             robot.plants.push({ num: bid.plantNum, cities: Math.floor(bid.plantNum / 3) + 1 });
             if (robot.plants.length > 3) robot.plants.shift();
             results += `Robot ${robot.id}: Bids ${bid.bid} (pays ${bid.actualCost}) on plant ${bid.plantNum}<br>`;
@@ -59,19 +59,22 @@ function simulate() {
         }
     }
 
-    // Resource Purchase Phase
+    // Resource Purchase Phase (uses Phase 3: Buying Resources)
     results += "<h3>Resource Purchase Phase</h3>";
-    robots.forEach(robot => {
-        const resources = robot.buyResources();
+    const resourceOrder = [...bidders];
+    for (let i = 0; i < resourceOrder.length; i++) {
+        const robot = resourceOrder[i];
+        const isLast = i === resourceOrder.length - 1;
+        const resources = robot.buyResources(isLast);
         if (resources.cost > 0) {
             robot.elektro -= resources.cost;
             results += `Robot ${robot.id}: Buys resources for ${resources.count} plant(s) costing ${resources.cost} Elektro<br>`;
         } else {
             results += `Robot ${robot.id}: Buys no resources<br>`;
         }
-    });
+    }
 
-    // Building Phase
+    // Building Phase (uses Phase 4: Building)
     results += "<h3>Building Phase</h3>";
     robots.forEach(robot => {
         const build = robot.build();
@@ -84,7 +87,7 @@ function simulate() {
         }
     });
 
-    // Power Generation Phase
+    // Power Generation Phase (uses Phase 3 indirectly for powering logic)
     results += "<h3>Power Generation Phase</h3>";
     robots.forEach(robot => {
         const power = robot.power();
