@@ -26,7 +26,14 @@ function simulate() {
     }
 
     let results = "<h2>Simulation Results</h2>";
-    const bidders = robots.sort((a, b) => b.cities - a.cities || b.plants[0]?.num - a.plants[0]?.num);
+
+    // Adjust turn order for "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«"
+    const lastInOrderRobots = robots.filter(r => r.eCard === "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«");
+    const otherRobots = robots.filter(r => r.eCard !== "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«");
+    const bidders = [
+        ...otherRobots.sort((a, b) => b.cities - a.cities || b.plants[0]?.num - a.plants[0]?.num),
+        ...lastInOrderRobots
+    ];
     const bidderOrder = bidders.map(r => r.id - 1);
     bidderOrder.splice(playerOrder - 1, 0, -1);
 
@@ -42,10 +49,10 @@ function simulate() {
         }
         const bid = robot.bid(available[0], available);
         if (bid) {
-            robot.elektro -= bid.bid;
+            robot.elektro -= bid.actualCost; // Use actualCost instead of bid for half-bid ability
             robot.plants.push({ num: bid.plantNum, cities: Math.floor(bid.plantNum / 3) + 1 });
             if (robot.plants.length > 3) robot.plants.shift();
-            results += `Robot ${robot.id}: Bids ${bid.bid} on plant ${bid.plantNum}<br>`;
+            results += `Robot ${robot.id}: Bids ${bid.bid} (pays ${bid.actualCost}) on plant ${bid.plantNum}<br>`;
             available.shift();
         } else {
             results += `Robot ${robot.id}: Passes<br>`;
@@ -84,6 +91,9 @@ function simulate() {
         robot.elektro += power.income;
         results += `Robot ${robot.id}: Powers ${power.citiesPowered} cities, earns ${power.income} Elektro<br>`;
     });
+
+    // Reset phase-specific flags
+    robots.forEach(robot => robot.resetPhase());
 
     document.getElementById("results").innerHTML = results;
 }

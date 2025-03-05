@@ -39,12 +39,12 @@ const cOptions = {
 };
 
 const eOptions = {
-    "Normal": () => ({ elektro: 0, plants: [], resources: [], cities: 0 }),
-    "+10": () => ({ elektro: 10, plants: [], resources: [], cities: 0 }),
-    "Plant": () => ({ elektro: 0, plants: [{ num: 13, cities: 2 }], resources: [], cities: 0 }),
-    "Resources": () => ({ elektro: 0, plants: [], resources: ["coal:3", "oil:3"], cities: 0 }),
-    "Cities": () => ({ elektro: 0, plants: [], resources: [], cities: 2 }),
-    "Discount": () => ({ elektro: 0, plants: [], resources: [], cities: 0 })
+    "GAME START: GETS 100 ELEKTRO": () => ({ elektro: 50, plants: [], resources: [], cities: 0 }), // Adds 50 to base 50
+    "PHASE 1: ALWAYS »LAST IN PLAYER ORDER«": () => ({ elektro: 0, plants: [], resources: [], cities: 0 }),
+    "PHASE 2: PAYS HALF BID FOR POWER PLANTS": () => ({ elektro: 0, plants: [], resources: [], cities: 0 }),
+    "PHASE 4: ALL CITIES COST 10 ELEKTRO": () => ({ elektro: 0, plants: [], resources: [], cities: 0 }),
+    "PHASE 4: ALWAYS BUILDS FIRST CITY FOR 0 ELEKTRO": () => ({ elektro: 0, plants: [], resources: [], cities: 0 }),
+    "PHASE 5: GETS INCOME FOR +1 CITY": () => ({ elektro: 0, plants: [], resources: [], cities: 0 })
 };
 
 // Robot class
@@ -61,7 +61,7 @@ class Robot {
         this.plants = [...plants.map(num => ({ num, cities: Math.floor(num / 3) + 1 })), ...special.plants];
         this.resources = resources + (special.resources.length ? "," + special.resources.join(",") : "");
         this.cities = cities + special.cities;
-        this.discount = eCard === "Discount" ? 5 : 0;
+        this.firstCityBuiltThisPhase = false; // Reset each Building Phase
     }
 
     bid(plantNum, market) {
@@ -69,7 +69,11 @@ class Robot {
         const bid = this.aCard === "Number" ? bidFunc(plantNum, this.elektro, this.cities) :
             this.aCard === "Highest" ? bidFunc(plantNum, this.elektro, market) :
                 bidFunc(plantNum, this.elektro);
-        return bid ? { bid, plantNum } : null;
+        if (bid) {
+            const actualCost = this.eCard === "PHASE 2: PAYS HALF BID FOR POWER PLANTS" ? Math.floor(bid / 2) : bid;
+            return { bid, actualCost, plantNum };
+        }
+        return null;
     }
 
     buyResources() {
@@ -81,13 +85,26 @@ class Robot {
     build() {
         const buildFunc = dOptions[this.dCard];
         const citiesToBuild = buildFunc(this.plants, this.cities);
-        const cost = citiesToBuild * (10 - this.discount);
+        let cost;
+        if (this.eCard === "PHASE 4: ALL CITIES COST 10 ELEKTRO") {
+            cost = citiesToBuild * 10;
+        } else if (this.eCard === "PHASE 4: ALWAYS BUILDS FIRST CITY FOR 0 ELEKTRO" && !this.firstCityBuiltThisPhase) {
+            cost = (citiesToBuild - 1) * 10; // First city free, others 10 Elektro
+            this.firstCityBuiltThisPhase = true;
+        } else {
+            cost = citiesToBuild * 10; // Simplified base cost
+        }
         return { cities: cost <= this.elektro ? citiesToBuild : 0, cost };
     }
 
     power() {
         const citiesPowered = cOptions[this.cCard](this.plants, this.cities, this.resources);
-        const income = [0, 10, 22, 33, 44, 54, 65, 76, 87, 98, 109, 120][citiesPowered] || 120;
-        return { citiesPowered, income: this.eCard === "+10" ? income + 10 : income };
+        const adjustedCities = this.eCard === "PHASE 5: GETS INCOME FOR +1 CITY" ? citiesPowered + 1 : citiesPowered;
+        const income = [0, 10, 22, 33, 44, 54, 65, 76, 87, 98, 109, 120][adjustedCities] || 120;
+        return { citiesPowered, income };
+    }
+
+    resetPhase() {
+        this.firstCityBuiltThisPhase = false; // Reset for next simulation
     }
 }

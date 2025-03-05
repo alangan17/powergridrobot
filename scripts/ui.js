@@ -6,7 +6,7 @@ function showInfo(inputId) {
         "b-card": "Defines the robot's resource buying behavior (e.g., 'Normal' buys for 2 plants, 'None' buys nothing).",
         "d-card": "Defines the robot's building behavior (e.g., 'Normal' builds to match plant capacity, 'None' builds nothing).",
         "c-card": "Defines how many cities the robot powers in the Power Generation Phase (e.g., 'Normal' powers all possible, 'None' powers none).",
-        "e-card": "Special ability affecting the robot (e.g., '+10' adds Elektro, 'Plant' starts with plant 13).",
+        "e-card": "Special ability affecting the robot (e.g., 'GETS 100 ELEKTRO' starts with 100 Elektro, 'PAYS HALF BID' reduces auction costs).",
         "elektro": "The robot's current money (Elektro) used for bidding, buying, and building.",
         "plants": "List of power plant numbers the robot owns (e.g., '3, 7, 13'). Enter as comma-separated values.",
         "resources": "Resources the robot has (e.g., 'coal:2, oil:4'). Enter as type:amount pairs separated by commas.",
